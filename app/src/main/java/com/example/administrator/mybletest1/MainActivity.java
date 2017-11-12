@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private int[] to = {R.id.device_name, R.id.device_mac,
     R.id.device_bond, R.id.device_type};
     private LinkedList<HashMap<String,String>> dataDevices;
+    private LinkedList<BluetoothDevice> allDevices;
     private HashSet<BluetoothDevice> deviceSet;
 
 
@@ -83,9 +85,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initListView(){
+        allDevices = new LinkedList<>();
         dataDevices = new LinkedList<>();
         adapter = new SimpleAdapter(this, dataDevices, R.layout.item_device,from, to);
         listDevices.setAdapter(adapter);
+
+        listDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent it = new Intent(MainActivity.this, ConnectActivity.class);
+                it.putExtra("device", allDevices.get(i));
+                startActivity(it);
+            }
+        });
+
     }
 
 
@@ -158,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
                         data.put(from[3], type);
 
                         dataDevices.add(data);
+                        allDevices.add(device);
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -165,5 +179,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void stopScan(View view) {
         scanLeDevice(false);
+
     }
 }
+
+
