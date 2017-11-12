@@ -40,6 +40,19 @@ public class BLEService extends Service {
                 List<BluetoothGattService> listServices = gatt.getServices();
                 for (BluetoothGattService service : listServices){
                     Log.i("brad", service.getUuid().toString());
+
+                    List<BluetoothGattCharacteristic> chrs =  service.getCharacteristics();
+                    for (BluetoothGattCharacteristic chr : chrs){
+                        Log.i("brad", "chr:" + chr.getUuid().toString());
+                        if (chr.getProperties() == (BluetoothGattCharacteristic.PROPERTY_READ |
+                                BluetoothGattCharacteristic.PROPERTY_NOTIFY)){
+                            Log.i("brad", "got R + N");
+                        }
+
+
+                    }
+
+
                 }
 
 
