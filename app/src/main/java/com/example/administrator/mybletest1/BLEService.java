@@ -5,11 +5,14 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
+import java.util.List;
 
 public class BLEService extends Service {
     private final LocalBinder mBinder = new LocalBinder();
@@ -21,7 +24,7 @@ public class BLEService extends Service {
             super.onConnectionStateChange(gatt, status, newState);
             if (newState == BluetoothProfile.STATE_CONNECTED){
                 Log.i("brad", "connected");
-                
+                gatt.discoverServices();
             }else if (newState == BluetoothProfile.STATE_DISCONNECTED){
                 Log.i("brad", "disconnected");
             }else if (newState == BluetoothProfile.STATE_DISCONNECTING){
@@ -32,6 +35,16 @@ public class BLEService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
+
+            if (status == BluetoothGatt.GATT_SUCCESS){
+                List<BluetoothGattService> listServices = gatt.getServices();
+                for (BluetoothGattService service : listServices){
+                    Log.i("brad", service.getUuid().toString());
+                }
+
+
+            }
+
         }
 
         @Override
