@@ -15,12 +15,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 123;
     private boolean isScanning;
     private Handler mHandler;
+
+    private ListView listDevices;
+    private SimpleAdapter adapter;
+    private String[] from = {"name","mac","bond","type"};
+    private int[] to = {R.id.device_name, R.id.device_mac,
+    R.id.device_bond, R.id.device_type};
+    private LinkedList<HashMap<String,String>> data;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +70,19 @@ public class MainActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
+
+        listDevices = (ListView)findViewById(R.id.listDevices);
+        initListView();
+
         mHandler = new Handler();
         scanLeDevice(true);
 
+    }
+
+    private void initListView(){
+        data = new LinkedList<>();
+        adapter = new SimpleAdapter(this, data, R.layout.item_device,from, to);
+        listDevices.setAdapter(adapter);
     }
 
 
