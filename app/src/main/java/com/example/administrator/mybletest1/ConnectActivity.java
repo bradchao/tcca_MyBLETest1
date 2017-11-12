@@ -14,7 +14,7 @@ public class ConnectActivity extends AppCompatActivity {
 
         device = (BluetoothDevice) getIntent().getParcelableExtra("device");
 
-        
+
 
     }
 }
