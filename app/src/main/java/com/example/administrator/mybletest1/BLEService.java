@@ -47,6 +47,8 @@ public class BLEService extends Service {
                         if (chr.getProperties() == (BluetoothGattCharacteristic.PROPERTY_READ |
                                 BluetoothGattCharacteristic.PROPERTY_NOTIFY)){
                             Log.i("brad", "got R + N");
+
+                            gatt.setCharacteristicNotification(chr, true);
                         }
 
 
@@ -73,6 +75,12 @@ public class BLEService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
+
+            byte[] value = characteristic.getValue();
+            for (byte v : value){
+                Log.i("brad", "value = " + v);
+            }
+
         }
     };
 
