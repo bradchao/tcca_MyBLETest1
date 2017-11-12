@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private String[] from = {"name","mac","bond","type"};
     private int[] to = {R.id.device_name, R.id.device_mac,
     R.id.device_bond, R.id.device_type};
-    private LinkedList<HashMap<String,String>> data;
+    private LinkedList<HashMap<String,String>> dataDevices;
+    private HashSet<BluetoothDevice> deviceSet;
 
 
     @Override
@@ -74,14 +76,15 @@ public class MainActivity extends AppCompatActivity {
         listDevices = (ListView)findViewById(R.id.listDevices);
         initListView();
 
+        deviceSet = new HashSet<>();
         mHandler = new Handler();
         scanLeDevice(true);
 
     }
 
     private void initListView(){
-        data = new LinkedList<>();
-        adapter = new SimpleAdapter(this, data, R.layout.item_device,from, to);
+        dataDevices = new LinkedList<>();
+        adapter = new SimpleAdapter(this, dataDevices, R.layout.item_device,from, to);
         listDevices.setAdapter(adapter);
     }
 
@@ -124,9 +127,39 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi,
                                      byte[] scanRecord) {
-                    String mac = device.getAddress();
-                    String name = device.getName();
-                    Log.i("brad", name + ":" + mac);
+                    if (deviceSet.add(device)) {
+                        String mac = device.getAddress();
+                        String name = device.getName();
+                        String state = "";
+                        switch(device.getBondState()){
+                            case BluetoothDevice.BOND_BONDED:
+                                state = "bonded"; break;
+                            case BluetoothDevice.BOND_BONDING:
+                                state = "bonding"; break;
+                            case BluetoothDevice.BOND_NONE:
+                                state = "none"; break;
+                        }
+                        String type= "";
+                        switch(device.getType()){
+                            case BluetoothDevice.DEVICE_TYPE_LE:
+                                type="LE"; break;
+                            case BluetoothDevice.DEVICE_TYPE_CLASSIC:
+                                type="classic"; break;
+                            case BluetoothDevice.DEVICE_TYPE_DUAL:
+                                type="dual"; break;
+                            default:
+                                type="xxx"; break;
+                        }
+
+                        HashMap<String,String> data = new HashMap<>();
+                        data.put(from[0], name);
+                        data.put(from[1], mac);
+                        data.put(from[2], state);
+                        data.put(from[3], type);
+
+                        dataDevices.add(data);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             };
 
